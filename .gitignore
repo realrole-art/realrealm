@@ -1,0 +1,19 @@
+# 编译输出
+*.o
+*.out
+*.exe
+Client/client
+Server/server
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+
+# macOS
+.DS_Store

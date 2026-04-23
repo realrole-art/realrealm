@@ -56,6 +56,41 @@
 
 // 构造函数的定义：初始化服务器，创建套接字、绑定地址信息结构体，启动监听
 chatServer::chatServer(const char *ip, int port, size_t threadPoolSize) : stop(false)
+{
+    // 1. 创建套接字
+    sfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sfd < 0)
+    {
+        errLog("socket 创建失败");
+        exit(EXIT_FAILURE);
+    }
+
+    // 2. 设置地址信息结构体
+    struct sockaddr_in sin;
+    memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;          // IPv4
+    sin.sin_port = htons(port);        // 端口号
+    sin.sin_addr.s_addr = inet_addr(ip); // IP 地址
+
+    // 3. 绑定套接字与地址信息结构体
+    if (bind(sfd, (struct sockaddr *)&sin, sizeof(sin)) < 0)
+    {
+        errLog("bind 绑定失败");
+        close(sfd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 4. 启动监听
+    if (listen(sfd, 128) < 0)
+    {
+        errLog("listen 监听失败");
+        close(sfd);
+        exit(EXIT_FAILURE);
+    }
+
+    // 5. 初始化线程池
+    startThreadPool(threadPoolSize);
+}
 // 析构函数的定义
 chatServer::~chatServer()
 // 启动线程池函数的定义

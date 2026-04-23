@@ -1,4 +1,23 @@
-#include <myhead.h>
+#include <vector>            
+#include <thread>            
+#include <queue>             
+#include <condition_variable> 
+#include <mutex>             
+#include <functional>         
+#include <iostream>       
+#include <string>            
+#include <cstring>           
+#include <cstdlib>          
+#include <unistd.h>          
+#include <sys/socket.h>      
+#include <netinet/in.h>      
+#include <arpa/inet.h>       
+#include <sys/select.h>      
+#include <sys/time.h>        
+#include <fcntl.h>           
+#include <errno.h>
+#include <thread> 
+
 #include "chatServer.h"
 
 int main(int argc, const char *argv[])

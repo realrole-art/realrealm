@@ -6,7 +6,7 @@
 /*
  * 函数：chatServer::chatServer(const char*, int, size_t)
  * 功能：构造函数，创建socket、绑定、监听，初始化线程池
- * 负责人：[___________]
+ * 负责人：[星奔川骛]
  */
 
 /*

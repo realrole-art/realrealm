@@ -12,7 +12,7 @@
 /*
  * 函数：chatServer::~chatServer()
  * 功能：析构函数，停止线程池、关闭套接字
- * 负责人：[___________]
+ * 负责人：[realrole]
  */
 
 /*
@@ -92,7 +92,14 @@ chatServer::chatServer(const char *ip, int port, size_t threadPoolSize) : stop(f
     startThreadPool(threadPoolSize);
 }
 // 析构函数的定义
-chatServer::~chatServer()
+chatServer::~chatServer(){
+    stop=true;
+    task_cv.notify_all(); // 唤醒所有线程
+    for(auto &x:workers){
+        x.join();
+    }
+    close(sfd);
+}
 // 启动线程池函数的定义
 void chatServer::startThreadPool(size_t numThreads)
 // 将任务加到线程池中

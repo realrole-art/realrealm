@@ -24,7 +24,7 @@
 /*
  * 函数：void chatServer::startThreadPool(size_t)
  * 功能：创建指定数量的工作线程，从任务队列取任务执行
- * 负责人：[___________]
+ * 负责人：[祈灵]
  */
 
 /*
@@ -101,7 +101,41 @@ chatServer::~chatServer(){
     close(sfd);
 }
 // 启动线程池函数的定义
-void chatServer::startThreadPool(size_t numThreads)
+void chatServer::startThreadPool(size_t numThreads){
+    for (size_t i = 0; i < numThreads; ++i){
+        //创建固定数量线程
+        workers.emplace_back([this]() {
+            while (true)
+            {
+				//不停地从任务队列中取任务执行
+                function<void()> task;
+
+                {
+                    unique_lock<mutex> lock(task_mutex);
+
+                    // 没任务就等待；如果 stop=true 也要被唤醒检查退出
+                    task_cv.wait(lock, [this]() {
+                        return stop || !tasks.empty();
+                        });
+
+                    // 线程池停止，并且没有剩余任务，线程退出
+                    if (stop && tasks.empty())
+                    {
+                        return;
+                    }
+
+                    // 取出一个任务
+                    task = std::move(tasks.front());
+                    tasks.pop();
+                }
+
+                // 在锁外执行任务，避免长时间占用锁
+                task();
+            }
+            });
+    }
+}
+
 // 将任务加到线程池中
 void chatServer::addTask(function<void()> task){
     // Locking: Protects the task queue, preventing data anomalies caused by multi-threaded queue operations.

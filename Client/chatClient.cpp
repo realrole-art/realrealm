@@ -18,7 +18,7 @@
 /*
  * 函数：void ChatClient::errLog(const char*)
  * 功能：打印错误日志
- * 负责人：[___________]
+ * 负责人：[realrole]
  */
 
 /*
@@ -49,7 +49,10 @@ ChatClient::~ChatClient()
 // 定义运行客户端函数
 void ChatClient::run()
 // 定义输出错误日志函数
-void ChatClient::errLog(const char *msg)
+void ChatClient::errLog(const char *msg){
+    cerr << __FILE__ << " " << __func__ << " " << __LINE__ << endl;
+    perror(msg);
+}
 // 定义向服务器发送消息的函数
 void ChatClient::sendMsg(int type, const string &text)
 // 定义接收服务器发来消息的函数

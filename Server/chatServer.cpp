@@ -18,7 +18,7 @@
 /*
  * 函数：void chatServer::errLog(const char*)
  * 功能：打印错误日志
- * 负责人：[___________]
+ * 负责人：[realrole]
  */
 
 /*
@@ -112,7 +112,10 @@ void chatServer::addTask(function<void()> task){
     task_cv.notify_one();
 }
 // 打印错误日志函数的定义
-void chatServer::errLog(const char *msg)
+void chatServer::errLog(const char *msg){
+    cerr << __FILE__ << "  " << __func__ << "  " << __FILE__ << endl;
+    perror(msg);
+}
 // 启动服务器函数的定义
 void chatServer::run()
 // 处理客户端消息的函数定义

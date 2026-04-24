@@ -30,7 +30,7 @@
 /*
  * 函数：void chatServer::addTask(function<void()>)
  * 功能：向任务队列添加任务，并唤醒一个工作线程
- * 负责人：[___________]
+ * 负责人：[默~]
  */
 
 /*
@@ -103,7 +103,14 @@ chatServer::~chatServer(){
 // 启动线程池函数的定义
 void chatServer::startThreadPool(size_t numThreads)
 // 将任务加到线程池中
-void chatServer::addTask(function<void()> task)
+void chatServer::addTask(function<void()> task){
+    // Locking: Protects the task queue, preventing data anomalies caused by multi-threaded queue operations.
+    std::lock_guard<std::mutex> lock(task_mutex);
+    // Move tasks into the Queue
+    tasks.push(std::move(task));
+    // Wake up a waiting worker thread to process a new task.
+    task_cv.notify_one();
+}
 // 打印错误日志函数的定义
 void chatServer::errLog(const char *msg)
 // 启动服务器函数的定义

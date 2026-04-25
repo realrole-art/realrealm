@@ -12,7 +12,7 @@
 /*
  * 函数：ChatClient::~ChatClient()
  * 功能：析构函数，关闭套接字
- * 负责人：[泰普寇德]
+ * 负责人：[___________]
  */
 
 /*
@@ -42,23 +42,18 @@
 // ========== 以下是函数实现代码，请在对应函数内编写 ==========
 #include "chatClient.h"
 // 构造函数的定义
-ChatClient::ChatClient(const char *ip, int port, const string &name) : name(name), running(true) {}
+ChatClient::ChatClient(const char *ip, int port, const string &name) : name(name), running(true)
 // 析构函数的定义
 ChatClient::~ChatClient()
-{
-    // 关闭客户端申请的套接字文件描述符
-    close(cfd);
-}
 
 // 定义运行客户端函数
-void ChatClient::run() {}
+void ChatClient::run()
 // 定义输出错误日志函数
-void ChatClient::errLog(const char *msg)
-{
+void ChatClient::errLog(const char *msg){
     cerr << __FILE__ << " " << __func__ << " " << __LINE__ << endl;
     perror(msg);
 }
 // 定义向服务器发送消息的函数
-void ChatClient::sendMsg(int type, const string &text) {}
+void ChatClient::sendMsg(int type, const string &text)
 // 定义接收服务器发来消息的函数
-void ChatClient::recvMsg() {}
+void ChatClient::recvMsg()

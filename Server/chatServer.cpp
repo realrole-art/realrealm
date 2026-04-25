@@ -48,7 +48,7 @@
 /*
  * 函数：void chatServer::broadcast(const MSG&, int)
  * 功能：向所有在线客户端广播消息，可排除指定fd
- * 负责人：[___________]
+ * 负责人：[懒惰鬼]
  */
 
 // ========== 以下是函数实现代码，请在对应函数内编写 ==========
@@ -155,4 +155,17 @@ void chatServer::run()
 // 处理客户端消息的函数定义
 void chatServer::handleClient(int client_fd, struct sockaddr_in cin)
 // 定义广播函数
-void chatServer::broadcast(const MSG &msg, int exclude_fd)
+void chatServer::broadcast(const MSG &msg, int exclude_fd){
+    //将消息结构体转为二进制数据，便于传输
+    string data = msg.serialize();
+    //传输
+    for(const auto &client : clients){
+        if(client.fd != exclude_fd){
+            if(send(client.fd,data.c_str(),data.size(),0) == -1){
+                perror("send error");
+                return ;
+            }
+        }
+    }
+
+}

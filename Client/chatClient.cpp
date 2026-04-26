@@ -12,7 +12,7 @@
 /*
  * 函数：ChatClient::~ChatClient()
  * 功能：析构函数，关闭套接字
- * 负责人：[___________]
+ * 负责人：[泰普寇德]
  */
 
 /*
@@ -82,9 +82,12 @@ ChatClient::ChatClient(const char *ip, int port, const std::string &name) : name
         exit(EXIT_FAILURE);
     }
 }
-
 // 析构函数的定义
 ChatClient::~ChatClient()
+{
+    // 关闭客户端文件套接字
+    close(cfd);
+}
 
 // 定义运行客户端函数
 void ChatClient::run(){

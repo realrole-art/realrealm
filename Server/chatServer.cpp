@@ -219,4 +219,14 @@ void chatServer::handleClient(int client_fd, struct sockaddr_in cin)
     }
 }
 // 定义广播函数
-void chatServer::broadcast(const MSG &msg, int exclude_fd)
+void chatServer::broadcast(const MSG& msg, int exclude_fd) {
+    lock_guard<mutex> lock(client_mutex);
+
+    for (auto& client : clients)
+    {
+        if (client.fd == exclude_fd)
+            continue;
+
+        send(client.fd, &msg, sizeof(msg), 0);
+    }
+}

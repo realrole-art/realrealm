@@ -81,6 +81,7 @@ void ChatClient::sendMsg(int type, const std::string &text)
     {
         errLog("chatClient:sendMsg:failed");
     }
+    
 }
 // 定义接收服务器发来消息的函数
 void ChatClient::recvMsg()

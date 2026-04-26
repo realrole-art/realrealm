@@ -155,4 +155,13 @@ void chatServer::run()
 // 处理客户端消息的函数定义
 void chatServer::handleClient(int client_fd, struct sockaddr_in cin)
 // 定义广播函数
-void chatServer::broadcast(const MSG &msg, int exclude_fd)
+void chatServer::broadcast(const MSG &msg, int exclude_fd){
+    lock_guard<mutex> lock(client_mutex);
+	//同时发送到所有在线的客户端，排除掉发送消息的客户端
+    for (auto& client : clients){
+        if (client.fd == exclude_fd)
+            continue;
+
+        send(client.fd, &msg, sizeof(msg), 0);
+    }
+}

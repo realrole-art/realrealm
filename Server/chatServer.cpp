@@ -154,5 +154,69 @@ void chatServer::errLog(const char *msg){
 void chatServer::run()
 // 处理客户端消息的函数定义
 void chatServer::handleClient(int client_fd, struct sockaddr_in cin)
+{
+    while (true)
+    {
+        MSG msg;
+        memset(&msg, 0, sizeof(msg));
+
+        int ret = recv(client_fd, &msg, sizeof(msg), 0);
+		//如果客户端离线或异常，则从在线列表移除，并关闭套接字
+        if (ret <= 0)
+        {
+            cout << "client offline: "
+                << inet_ntoa(cin.sin_addr) << ":"
+                << ntohs(cin.sin_port) << endl;
+
+            // 从在线列表移除
+            {
+                lock_guard<mutex> lock(client_mutex);
+                for (auto it = clients.begin(); it != clients.end(); ++it)
+                {
+                    if (it->fd == client_fd)
+                    {
+                        clients.erase(it);
+                        break;
+                    }
+                }
+            }
+
+            close(client_fd);
+            break;
+        }
+
+        // 根据消息类型处理
+        if (msg.type == LOGIN)
+        {
+            cout << msg.name << " login" << endl;
+            broadcast(msg, client_fd);
+        }
+        else if (msg.type == CHAT)
+        {
+            cout << "[" << msg.name << "] " << msg.text << endl;
+            broadcast(msg, client_fd);
+        }
+        else if (msg.type == QUIT)
+        {
+            cout << msg.name << " quit" << endl;
+            broadcast(msg, client_fd);
+
+            {
+                lock_guard<mutex> lock(client_mutex);
+                for (auto it = clients.begin(); it != clients.end(); ++it)
+                {
+                    if (it->fd == client_fd)
+                    {
+                        clients.erase(it);
+                        break;
+                    }
+                }
+            }
+
+            close(client_fd);
+            break;
+        }
+    }
+}
 // 定义广播函数
 void chatServer::broadcast(const MSG &msg, int exclude_fd)

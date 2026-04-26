@@ -36,7 +36,7 @@
 /*
  * 函数：void ChatClient::run()
  * 功能：主循环，使用select监听标准输入和socket
- * 负责人：[___________]
+ * 负责人：[懒惰鬼]
  */
 
 // ========== 以下是函数实现代码，请在对应函数内编写 ==========
@@ -56,4 +56,32 @@ void ChatClient::errLog(const char *msg){
 // 定义向服务器发送消息的函数
 void ChatClient::sendMsg(int type, const string &text)
 // 定义接收服务器发来消息的函数
-void ChatClient::recvMsg()
+void ChatClient::recvMsg(){
+    //接收消息
+    char buf[sizeof(MSG)] = "";
+    while(running){
+        //非阻塞接收
+        int rec = recv(cfd,buf,size(buf),MSG_DONTWAIT);
+        if(rec < 0){
+            if(errno == EAGAIN){
+                usleep(100000);
+
+            }
+            else{
+                errLog("recv error");
+                running = false;
+                break;
+            }
+        }
+         else if (recv_len == 0){
+            errLog("recv error");
+            running = false;
+            break; 
+        }
+        else{
+            MSG msg;
+            msg.deserialize(string(buf, rec));
+            cout << msg.name << ':' << msg.text << endl;
+        }
+    }
+}

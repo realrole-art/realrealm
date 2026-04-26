@@ -30,7 +30,7 @@
 /*
  * 函数：void ChatClient::recvMsg()
  * 功能：接收服务器消息、反序列化并显示
- * 负责人：[___________]
+ * 负责人：[懒惰鬼]
  */
 
 /*
@@ -92,9 +92,9 @@ ChatClient::~ChatClient()
 // 定义运行客户端函数
 void ChatClient::run(){
     thread recvThread(&ChatClient::recvMsg, this); // 创建接收消息的线程
-    string text;
+    std::string text;
     while(running){
-        getline(cin,text);
+        std::getline(cin,text);
         sendMsg(CHAT,text);
     }
     recvThread.join(); // 等待接收线程结束

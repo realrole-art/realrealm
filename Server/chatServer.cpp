@@ -36,13 +36,13 @@
 /*
  * 函数：void chatServer::run()
  * 功能：主循环，accept新连接，将客户端加入列表并交给线程池处理
- * 负责人：[___________]
+ * 负责人：[realrole]
  */
 
 /*
  * 函数：void chatServer::handleClient(int, struct sockaddr_in)
  * 功能：处理单个客户端连接，循环接收消息，根据类型处理登录/聊天/退出
- * 负责人：[___________]
+ * 负责人：[默~]
  */
 
 /*
@@ -157,7 +157,21 @@ void chatServer::errLog(const char *msg)
     perror(msg);
 }
 // 启动服务器函数的定义
-void chatServer::run()
+void chatServer::run(){
+    while(true){
+        struct sockaddr_in cin;
+        socklen_t clen=sizeof(cin);
+        int client_fd=accept(sfd,(struct sockaddr *)&cin,&clen);
+        if(client_fd<0){
+            errLog("accept error");
+            continue;
+        }
+        // 将处理客户端的任务添加到线程池
+        addTask([this, client_fd, cin] {
+            this->handleClient(client_fd, cin);
+        });
+    }
+}
 
 // 处理客户端消息的函数定义
 void chatServer::handleClient(int client_fd, struct sockaddr_in cin){

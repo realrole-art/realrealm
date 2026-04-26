@@ -24,7 +24,7 @@
 /*
  * 函数：void ChatClient::sendMsg(int, const string&)
  * 功能：序列化消息并通过socket发送
- * 负责人：[___________]
+ * 负责人：[_____curiosity______]
  */
 
 /*
@@ -42,7 +42,7 @@
 // ========== 以下是函数实现代码，请在对应函数内编写 ==========
 #include "chatClient.h"
 // 构造函数的定义
-ChatClient::ChatClient(const char *ip, int port, const string &name) : name(name), running(true)
+ChatClient::ChatClient(const char *ip, int port, const std::string &name) : name(name), running(true)
 // 析构函数的定义
 ChatClient::~ChatClient()
 
@@ -50,10 +50,37 @@ ChatClient::~ChatClient()
 void ChatClient::run()
 // 定义输出错误日志函数
 void ChatClient::errLog(const char *msg){
-    cerr << __FILE__ << " " << __func__ << " " << __LINE__ << endl;
-    perror(msg);
+    std::cerr << __FILE__ << " " << __func__ << " " << __LINE__ << std::endl;
+    std::perror(msg);
 }
 // 定义向服务器发送消息的函数
-void ChatClient::sendMsg(int type, const string &text)
+void ChatClient::sendMsg(int type, const std::string &text)
+{
+
+    //只做发送，判断是否发送成功，对type不做判断
+
+    //新建MSG结构体来调用序列化函数给send函数用
+    ChatClient::MSG msg;
+    //把客户类中的数据赋给msg
+    msg.type = type;
+
+    //用strncpy从类中拿到数据
+    //size设置为-1手动结束符刹车
+    std::strncpy(msg.name,name.c_str(),sizeof(msg.name) - 1);
+    msg.name[sizeof(msg.name) - 1] = '\0';
+
+    std::strncpy(msg.text,text.c_str(),sizeof(msg.text) - 1);
+    msg.text[sizeof(msg.text) - 1] = '\0';
+
+    //调用msg序列化函数，拷贝数据准备send
+    std::string serialized_data = msg.serialize();
+    //flag位设置为0
+    //默认，阻塞式的数据发送
+    ssize_t sent_bytes = send(cfd,serialized_data.c_str(),sizeof(serialized_data.c_str()),0);
+    if(sent_bytes < 0)
+    {
+        errLog("chatClient:sendMsg:failed");
+    }
+}
 // 定义接收服务器发来消息的函数
 void ChatClient::recvMsg()

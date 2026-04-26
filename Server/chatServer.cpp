@@ -15,7 +15,7 @@
  * 负责人：[realrole]
  */
 
-/*
+/*`
  * 函数：void chatServer::errLog(const char*)
  * 功能：打印错误日志
  * 负责人：[realrole]

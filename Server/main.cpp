@@ -25,7 +25,7 @@ int main(int argc, const char *argv[])
     // 判断传参是否正确
     if (argc < 3)
     {
-        cout << "请输入 ip 地址和 端口号" << endl;
+        std::cout << "请输入 ip 地址和 端口号" << std::endl;
         return -1;
     }
 

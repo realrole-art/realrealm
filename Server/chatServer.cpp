@@ -107,41 +107,30 @@ void chatServer::startThreadPool(size_t numThreads)
 {
     for (size_t i = 0; i < numThreads; ++i)
     {
-        // 创建固定数量线程
-        workers.emplace_back([this]()
-                             {
+        workers.emplace_back([this]() {
             while (true)
             {
-				//不停地从任务队列中取任务执行
-                function<void()> task;
-
+                std::function<void()> task;   // 局部任务对象
                 {
-                    unique_lock<mutex> lock(task_mutex);
-
-                    // 没任务就等待；如果 stop=true 也要被唤醒检查退出
-                    task_cv.wait(lock, [this]() {
+                    std::unique_lock<std::mutex> lock(task_mutex);   // 正确：unique_lock
+                    task_cv.wait(lock, [this] {
                         return stop || !tasks.empty();
-                        });
+                    });
 
-                    // 线程池停止，并且没有剩余任务，线程退出
                     if (stop && tasks.empty())
-                    {
                         return;
-                    }
 
-                    // 取出一个任务
-                    task = std::move(tasks.front());
-                    tasks.pop();
+                    task = std::move(tasks.front());   // 从成员队列取出
+                    tasks.pop();                       // 弹出
                 }
-
-                // 在锁外执行任务，避免长时间占用锁
-                task();
-            } });
+                task();   // 执行任务
+            }
+        });
     }
 }
 
 // 将任务加到线程池中
-void chatServer::addTask(function<void()> task)
+void chatServer::addTask(std::function<void()> task)
 {
     // Locking: Protects the task queue, preventing data anomalies caused by multi-threaded queue operations.
     std::lock_guard<std::mutex> lock(task_mutex);
@@ -153,7 +142,7 @@ void chatServer::addTask(function<void()> task)
 // 打印错误日志函数的定义
 void chatServer::errLog(const char *msg)
 {
-    cerr << __FILE__ << "  " << __func__ << "  " << __FILE__ << endl;
+    std::cerr << __FILE__ << "  " << __func__ << "  " << __FILE__ << std::endl;
     perror(msg);
 }
 // 启动服务器函数的定义
@@ -209,7 +198,7 @@ void chatServer::handleClient(int client_fd, struct sockaddr_in cin){
 
         // Deserialize binary data into a MSG structure.
         MSG msg;
-        msg.deserialize(string(recv_buf, recv_len));
+        msg.deserialize(std::string(recv_buf, recv_len));
 
         // process messages according to their type.
         switch (msg.type)
@@ -265,13 +254,14 @@ void chatServer::handleClient(int client_fd, struct sockaddr_in cin){
 // 定义广播函数
 void chatServer::broadcast(const MSG &msg, int exclude_fd){
     //将消息结构体转为二进制数据，便于传输
-    string data = msg.serialize();
+    std::string data = msg.serialize();
+    std::lock_guard<std::mutex> lock(client_mutex); // 加锁保护遍历
     //传输
     for(const auto &client : clients){
         if(client.fd != exclude_fd){
             if(send(client.fd,data.c_str(),data.size(),0) == -1){
                 perror("send error");
-                return ;
+                continue;
             }
         }
     }

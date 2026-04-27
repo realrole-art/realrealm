@@ -74,7 +74,7 @@ ChatClient::ChatClient(const char *ip, int port, const std::string &name) : name
     strncpy(msg.name, name.c_str(), sizeof(msg.name) - 1);
     strncpy(msg.text, "", sizeof(msg.text) - 1);
 
-    string data = msg.serialize();
+    std::string data = msg.serialize();
     if (send(cfd, data.c_str(), data.size(), 0) < 0)
     {
         errLog("send 发送登录消息失败");
@@ -91,10 +91,10 @@ ChatClient::~ChatClient()
 
 // 定义运行客户端函数
 void ChatClient::run(){
-    thread recvThread(&ChatClient::recvMsg, this); // 创建接收消息的线程
+    std::thread recvThread(&ChatClient::recvMsg, this); // 创建接收消息的线程
     std::string text;
     while(running){
-        std::getline(cin,text);
+        std::getline(std::cin,text);
         sendMsg(CHAT,text);
     }
     recvThread.join(); // 等待接收线程结束
@@ -112,6 +112,7 @@ void ChatClient::sendMsg(int type, const std::string &text)
 
     //新建MSG结构体来调用序列化函数给send函数用
     ChatClient::MSG msg;
+    memset(&msg, 0, sizeof(msg)); // 初始化结构体，避免垃圾数据干扰
     //把客户类中的数据赋给msg
     msg.type = type;
 
@@ -127,7 +128,7 @@ void ChatClient::sendMsg(int type, const std::string &text)
     std::string serialized_data = msg.serialize();
     //flag位设置为0
     //默认，阻塞式的数据发送
-    ssize_t sent_bytes = send(cfd,serialized_data.c_str(),sizeof(serialized_data.c_str()),0);
+    ssize_t sent_bytes = send(cfd,serialized_data.c_str(),serialized_data.size(),0);
     if(sent_bytes < 0)
     {
         errLog("chatClient:sendMsg:failed");
@@ -140,7 +141,7 @@ void ChatClient::recvMsg(){
     char buf[sizeof(MSG)] = "";
     while(running){
         //非阻塞接收
-        int rec = recv(cfd,buf,size(buf),MSG_DONTWAIT);
+        int rec = recv(cfd,buf,sizeof(buf),MSG_DONTWAIT);
         if(rec < 0){
             if(errno == EAGAIN){
                 usleep(100000);
@@ -152,15 +153,15 @@ void ChatClient::recvMsg(){
                 break;
             }
         }
-         else if (recv_len == 0){
+         else if (rec == 0){
             errLog("recv error");
             running = false;
             break; 
         }
         else{
             MSG msg;
-            msg.deserialize(string(buf, rec));
-            cout << msg.name << ':' << msg.text << endl;
+            msg.deserialize(std::string(buf, rec));
+            std::cout << msg.name << ':' << msg.text << std::endl;
         }
     }
 }

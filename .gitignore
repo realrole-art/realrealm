@@ -17,3 +17,4 @@ Server/server
 
 # macOS
 .DS_Store
+/build

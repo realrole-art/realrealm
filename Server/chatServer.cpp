@@ -72,6 +72,9 @@ chatServer::chatServer(const char *ip, int port, size_t threadPoolSize) : stop(f
     sin.sin_port = htons(port);          // 端口号
     sin.sin_addr.s_addr = inet_addr(ip); // IP 地址
 
+    int opt = 1;
+    setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
     // 3. 绑定套接字与地址信息结构体
     if (bind(sfd, (struct sockaddr *)&sin, sizeof(sin)) < 0)
     {

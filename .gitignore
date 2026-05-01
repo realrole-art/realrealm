@@ -7,6 +7,7 @@ Server/server
 
 # IDE 配置
 .vscode/
+.vs/
 .idea/
 *.swp
 *.swo
@@ -18,3 +19,32 @@ Server/server
 # macOS
 .DS_Store
 /build
+
+
+# build目录
+build/
+*/build/
+out/
+
+# Qt Creator
+.qtcreator/
+*.user
+*.autosave
+CMakeLists.txt.user
+
+# 编译产物
+*.exe
+*.dll
+*.so
+*.a
+*.o
+*.obj
+
+# MinGW
+libgcc_*.dll
+libstdc++*.dll
+libwinpthread*.dll
+
+# Qt deploy
+plugins/
+platforms/

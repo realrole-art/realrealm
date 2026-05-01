@@ -256,7 +256,6 @@ void chatServer::handleClient(int client_fd, struct sockaddr_in cin){
 }
 // 定义广播函数
 void chatServer::broadcast(const MSG &msg, int exclude_fd){
-
     //将消息结构体转为二进制数据，便于传输
     std::string data = msg.serialize();
     std::lock_guard<std::mutex> lock(client_mutex); // 加锁保护遍历

@@ -17,7 +17,7 @@ dpkg -l | grep qt6
 2.安装补充依赖：
 sudo apt install libgl1-mesa-dev mesa-common-dev libglu1-mesa-dev
 
-# 安装文泉驿微米黑（Linux 上常用的开源中文字体）
+安装文泉驿微米黑（Linux 上常用的开源中文字体）
 sudo apt update
 sudo apt install fonts-wqy-microhei
 第二步验证，应该有三个“ii”开头的输出，而不是没有输出：

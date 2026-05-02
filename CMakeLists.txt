@@ -13,4 +13,5 @@ else()
     # On non-Windows platforms build Client and Server
     add_subdirectory(Client)
     add_subdirectory(Server)
+    add_subdirectory(qt-client)
 endif()

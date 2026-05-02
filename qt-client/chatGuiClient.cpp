@@ -64,6 +64,13 @@ void ChatGuiClient::initUi()
 
     setStyleSheet(R"(
         QWidget {
+        background-color: #f4f6fb;
+        /* 优先使用文泉驿微米黑，这是 Linux 下显示效果较好的开源字体 */
+        /* 后面加上 Microsoft YaHei 是为了兼容如果你以后在 Windows 下编译运行 */
+        font-family: "WenQuanYi Micro Hei", "Droid Sans Fallback", "Microsoft YaHei", "STHeiti", "sans-serif";
+        font-size: 14px;
+        }
+        QWidget {
             background-color: #f4f6fb;
             font-family: "Microsoft YaHei", "Arial";
             font-size: 14px;
@@ -154,8 +161,11 @@ void ChatGuiClient::readServerMessage()
         std::memset(&msg, 0, sizeof(msg));
         msg.deserialize(data);
 
-        QString sender = QString::fromLocal8Bit(msg.name).trimmed();
-        QString text = QString::fromLocal8Bit(msg.text).trimmed();
+        // QString sender = QString::fromLocal8Bit(msg.name).trimmed();
+        // QString text = QString::fromLocal8Bit(msg.text).trimmed();
+        // 显式使用 UTF-8 解析
+        QString sender = QString::fromUtf8(msg.name).trimmed();
+        QString text = QString::fromUtf8(msg.text).trimmed();
 
         if (msg.type == MSG_LOGIN) {
             appendSystemMessage(sender + " 加入聊天室");
@@ -245,8 +255,21 @@ void ChatGuiClient::sendMsg(int type, const QString& text)
     std::memset(&msg, 0, sizeof(msg));
     msg.type = type;
 
-    QByteArray nameBytes = userName.toLocal8Bit();
-    QByteArray textBytes = text.toLocal8Bit();
+    // QByteArray nameBytes = userName.toLocal8Bit();
+    // QByteArray textBytes = text.toLocal8Bit();
+    // 显式转换为 UTF-8 字节流
+    QByteArray nameBytes = userName.toUtf8();
+    QByteArray textBytes = text.toUtf8();
+
+    // 注意：std::strncpy 可能会在 UTF-8 字符中间截断导致乱码
+    // 确保 sizeof(msg.name) 足够大
+    std::memset(msg.name, 0, sizeof(msg.name));
+    std::memcpy(msg.name, nameBytes.constData(), 
+                std::min((size_t)nameBytes.size(), sizeof(msg.name) - 1));
+
+    std::memset(msg.text, 0, sizeof(msg.text));
+    std::memcpy(msg.text, textBytes.constData(), 
+                std::min((size_t)textBytes.size(), sizeof(msg.text) - 1));
 
     std::strncpy(msg.name, nameBytes.constData(), sizeof(msg.name) - 1);
     std::strncpy(msg.text, textBytes.constData(), sizeof(msg.text) - 1);

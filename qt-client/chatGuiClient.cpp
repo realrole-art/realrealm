@@ -64,6 +64,13 @@ void ChatGuiClient::initUi()
 
     setStyleSheet(R"(
         QWidget {
+        background-color: #f4f6fb;
+        /* 优先使用文泉驿微米黑，这是 Linux 下显示效果较好的开源字体 */
+        /* 后面加上 Microsoft YaHei 是为了兼容如果你以后在 Windows 下编译运行 */
+        font-family: "WenQuanYi Micro Hei", "Droid Sans Fallback", "Microsoft YaHei", "STHeiti", "sans-serif";
+        font-size: 14px;
+        }
+        QWidget {
             background-color: #f4f6fb;
             font-family: "Microsoft YaHei", "Arial";
             font-size: 14px;

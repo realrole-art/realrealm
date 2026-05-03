@@ -38,9 +38,9 @@ public:
         char text[N];  // 消息内容
 
         // 序列化函数：将消息结构体转为二进制数据，便于传输
-        string serialize() const
+        std::string serialize() const
         {
-            string data;                                                      // 临时变量存储要转换的字符串
+            std::string data;                                                      // 临时变量存储要转换的字符串
             data.append(reinterpret_cast<const char *>(&type), sizeof(type)); // 将消息类型放入字符串
             data.append(name, sizeof(name));                                  // 将消息中的客户端名称放入字符串
             data.append(text, sizeof(text));                                  // 将消息正文放入字符串
@@ -49,7 +49,7 @@ public:
         }
 
         // 反序列化函数：将二进制数据转换为结构体
-        void deserialize(const string &data)
+        void deserialize(const std::string &data)
         {
             size_t offset = 0; // 截取字符串时的偏移量
 
@@ -66,15 +66,15 @@ public:
     // 类中私有成员
 private:
     int cfd;      // 客户端套接字
-    string name;  // 客户端名称
+    std::string name;  // 客户端名称
     bool running; // 判断客户端是否允许的标志
 
     void errLog(const char *msg);                    // 错误日志函数
-    void sendMsg(int type, const string &text = ""); // 发送消息函数
+    void sendMsg(int type, const std::string &text = ""); // 发送消息函数
     void recvMsg();                                  // 接收消息函数
 
 public:
-    ChatClient(const char *ip, int port, const string &name); // 有参构造
+    ChatClient(const char *ip, int port, const std::string &name); // 有参构造
     ~ChatClient();                                            // 析构函数
 
     void run(); // 客户端运行函数

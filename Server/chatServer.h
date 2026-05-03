@@ -11,6 +11,7 @@
 #include <string>            
 #include <cstring>           
 #include <cstdlib>          
+#include<algorithm>
 #include <unistd.h>          
 #include <sys/socket.h>      
 #include <netinet/in.h>      
@@ -37,9 +38,9 @@ public:
         char text[N];  // 消息内容
 
         // 序列化函数：将消息结构体转为二进制数据，便于传输
-        string serialize() const
+        std::string serialize() const
         {
-            string data;                                                      // 临时变量存储要转换的字符串
+            std::string data;                                                      // 临时变量存储要转换的字符串
             data.append(reinterpret_cast<const char *>(&type), sizeof(type)); // 将消息类型放入字符串
             data.append(name, sizeof(name));                                  // 将消息中的客户端名称放入字符串
             data.append(text, sizeof(text));                                  // 将消息正文放入字符串
@@ -48,7 +49,7 @@ public:
         }
 
         // 反序列化函数：将二进制数据转换为结构体
-        void deserialize(const string &data)
+        void deserialize(const std::string &data)
         {
             size_t offset = 0; // 截取字符串时的偏移量
 
@@ -71,19 +72,19 @@ public:
 
 private:
     int sfd;                // 服务器套接字
-    vector<Client> clients; // 在线的客户端列表
-    mutex client_mutex;     // 保护 clients  客户端列表的互斥锁
+    std::vector<Client> clients; // 在线的客户端列表
+    std::mutex client_mutex;     // 保护 clients  客户端列表的互斥锁
 
     // 线程池相关变量
-    vector<thread> workers;        // 存储工作的线程容器
-    queue<function<void()>> tasks; // 存储任务的队列
-    mutex task_mutex;              // 互斥锁
-    condition_variable task_cv;    // 用于通知线程有新任务的条件变量
+    std::vector<std::thread> workers;        // 存储工作的线程容器
+    std::queue<std::function<void()>> tasks; // 存储任务的队列
+    std::mutex task_mutex;              // 互斥锁
+    std::condition_variable task_cv;    // 用于通知线程有新任务的条件变量
     bool stop;                     // 线程池的标志，判断线程池是否停止
 
     void errLog(const char *msg);            // 错误信息日志函数
     void startThreadPool(size_t numThreads); // 启动线程池函数
-    void addTask(function<void()> task);     // 将任务添加到线程池中
+    void addTask(std::function<void()> task);     // 将任务添加到线程池中
 
 public:
     chatServer(const char *ip, int port, size_t threadPoolSize = 4); // 构造函数声明
